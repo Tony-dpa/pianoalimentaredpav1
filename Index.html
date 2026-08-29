@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Piano Alimentare</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root{
+  --bg: #eef1e6;
+  --ink: #262421;
+  --ink-soft: #6f6a5c;
+  --primary: #3f6b4a;
+  --primary-dark: #2b4c33;
+  --accent: #d9a441;
+  --card: #fffdf8;
+  --line: #ddd7c4;
+  --berry: #a24d4d;
+  --radius: 14px;
+  --shadow: 0 2px 10px rgba(43,76,51,0.08);
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+html,body{margin:0;padding:0;}
+body{
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(217,164,65,0.10), transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(63,107,74,0.08), transparent 45%);
+  color: var(--ink);
+  font-family: 'Work Sans', -apple-system, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 48px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap{ max-width: 560px; margin: 0 auto; padding: 0 16px; }
+
+header{ padding: 22px 16px 14px; max-width: 560px; margin: 0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap: 10px; }
+.eyebrow{
+  font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--primary); font-weight: 700;
+  display:flex; align-items:center; gap: 8px;
+}
+.eyebrow::before{ content:''; width: 8px; height:8px; border-radius:50%; background: var(--accent); }
+h1{
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 500;
+  font-size: 34px; margin: 4px 0 0; color: var(--ink); letter-spacing: -0.01em;
+}
+.header-actions{ display:flex; align-items:center; gap:8px; margin-top: 6px; }
+.status-pill{
+  font-family:'Space Mono', monospace; font-size: 10px; letter-spacing:0.04em;
+  padding: 4px 9px; border-radius: 999px; display:flex; align-items:center; gap:5px; white-space:nowrap;
+}
+.status-pill.ok{ background: rgba(63,107,74,0.12); color: var(--primary-dark); }
+.status-pill.err{ background: rgba(162,77,77,0.12); color: var(--berry); }
+.status-pill .dot{ width:6px; height:6px; border-radius:50%; background: currentColor; }
+.gear-btn{
+  background: var(--card); border: 1px solid var(--line); width:36px; height:36px; border-radius:50%;
+  font-size:16px; cursor:pointer; box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center;
+}
+.gear-btn:active{ transform: scale(0.92); }
+
+.week-nav{ display:flex; align-items:center; justify-content:space-between; margin-top: 18px; padding: 10px 4px; }
+.week-nav button{
+  background: var(--card); border: 1px solid var(--line); color: var(--primary-dark);
+  width: 38px; height:38px; border-radius: 50%; font-size: 18px; cursor:pointer;
+  box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center;
+  transition: transform .15s ease, background .15s ease;
+}
+.week-nav button:active{ transform: scale(0.92); }
+.week-label{ text-align:center; flex:1; }
+.week-label .range{ font-family:'Space Mono', monospace; font-size: 13px; color: var(--ink-soft); letter-spacing: 0.02em; }
+.week-label button.today-btn{
+  background:none; border:none; color: var(--primary); font-size: 11px;
+  text-decoration: underline; text-underline-offset: 3px; cursor:pointer;
+  padding: 2px 0 0; font-family:'Work Sans',sans-serif; font-weight:600;
+}
+
+.day-tabs{ display:flex; gap: 6px; overflow-x: auto; padding: 4px 4px 10px; scrollbar-width:none; }
+.day-tabs::-webkit-scrollbar{ display:none; }
+.day-tab{
+  flex: 0 0 auto; width: 50px; padding: 9px 0 7px; border-radius: 12px 12px 6px 6px;
+  background: var(--card); border: 1px solid var(--line); text-align:center; cursor:pointer;
+  position: relative; transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.day-tab .dow{ font-family:'Work Sans', sans-serif; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); }
+.day-tab .num{ font-family:'Space Mono', monospace; font-size: 16px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+.day-tab .dots{ display:flex; justify-content:center; gap:2px; margin-top:6px; height:5px; flex-wrap: wrap; }
+.day-tab .dots span{ width:4px; height:4px; border-radius:50%; background: var(--line); }
+.day-tab .dots span.filled{ background: var(--accent); }
+.day-tab.is-today .dow{ color: var(--primary); }
+.day-tab.is-selected{ background: var(--primary); border-color: var(--primary-dark); transform: translateY(-4px); box-shadow: 0 6px 14px rgba(43,76,51,0.25); }
+.day-tab.is-selected .dow{ color: rgba(255,255,255,0.75); }
+.day-tab.is-selected .num{ color: #fff; }
+.day-tab.is-selected .dots span{ background: rgba(255,255,255,0.35); }
+.day-tab.is-selected .dots span.filled{ background: var(--accent); }
+
+.day-panel{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 16px 14px; margin-top: 4px; }
+.day-panel .day-title{ font-family:'Fraunces', serif; font-size: 22px; font-weight: 600; margin: 0 0 14px; display:flex; align-items:baseline; justify-content:space-between; gap: 8px; }
+.day-panel .day-title small{ font-family:'Space Mono', monospace; font-size: 12px; font-weight: 400; color: var(--ink-soft); }
+
+.meal{ border-top: 1px dashed var(--line); padding: 13px 0; }
+.meal:first-of-type{ border-top: none; padding-top: 0; }
+.meal-label{ display:flex; align-items:center; gap:8px; font-family:'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; margin-bottom: 9px; }
+.meal-label .icon{ font-size: 14px; }
+
+.chips{ display:flex; flex-wrap:wrap; gap: 7px; align-items:center; }
+.chip{
+  display:flex; align-items:center; gap:6px; background: #f2f0e4; border: 1px solid var(--line);
+  border-radius: 999px; padding: 6px 6px 6px 12px; font-size: 13.5px; color: var(--ink); line-height:1.2;
+}
+.chip button{
+  border:none; background: rgba(162,77,77,0.12); color: var(--berry); width:18px; height:18px;
+  border-radius:50%; font-size: 12px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
+}
+.chip-add{
+  display:flex; align-items:center; gap:5px; background: transparent; border: 1px dashed #c7c0aa;
+  color: var(--primary-dark); border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight:600;
+  cursor:pointer; font-family:'Work Sans',sans-serif;
+}
+.chip-add:active{ transform: scale(0.96); }
+
+.actions{ display:flex; gap:10px; margin-top: 16px; }
+.actions button{
+  flex:1; border: none; padding: 12px 14px; border-radius: 10px; font-family:'Work Sans', sans-serif;
+  font-weight: 600; font-size: 14px; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+  transition: transform .15s ease, opacity .15s ease;
+}
+.actions button:active{ transform: scale(0.97); }
+.btn-copy{ background: var(--primary); color: #fff; }
+.btn-clear{ background: transparent; color: var(--berry); border: 1px solid rgba(162,77,77,0.35) !important; }
+
+.toast{
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--primary-dark); color: #fff; padding: 10px 18px; border-radius: 999px;
+  font-size: 13px; font-family:'Work Sans',sans-serif; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; z-index: 50;
+}
+.toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+.tip{ text-align:center; font-size: 12px; color: var(--ink-soft); margin-top: 22px; line-height:1.5; padding: 0 20px; }
+.tip b{ color: var(--primary-dark); }
+
+.loading{ text-align:center; color: var(--ink-soft); font-family:'Space Mono',monospace; font-size: 12px; padding: 30px 0; }
+
+.modal-backdrop{
+  position: fixed; inset:0; background: rgba(38,36,33,0.45); display:flex; align-items:flex-end;
+  justify-content:center; z-index: 100; opacity:0; pointer-events:none; transition: opacity .2s ease;
+}
+.modal-backdrop.show{ opacity:1; pointer-events:auto; }
+.modal{
+  background: var(--card); width: 100%; max-width: 560px; border-radius: 20px 20px 0 0;
+  padding: 16px 16px 20px; max-height: 82vh; display:flex; flex-direction:column;
+  transform: translateY(16px); transition: transform .2s ease;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+}
+.modal-backdrop.show .modal{ transform: translateY(0); }
+.modal-handle{ width:36px; height:4px; background: var(--line); border-radius: 4px; margin: 0 auto 12px; }
+.modal-title{ font-family:'Fraunces', serif; font-size: 18px; font-weight:600; margin: 0 0 12px; display:flex; align-items:center; justify-content:space-between; }
+.modal-title .close-x{ border:none; background:none; font-size: 20px; color: var(--ink-soft); cursor:pointer; padding:4px; line-height:1; }
+.search-box{
+  display:flex; align-items:center; gap:8px; background:#f2f0e4; border: 1px solid var(--line);
+  border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+}
+.search-box .mag{ color: var(--ink-soft); font-size:14px; }
+.search-box input{ flex:1; border:none; background:transparent; font-family:'Work Sans',sans-serif; font-size: 15px; color: var(--ink); }
+.search-box input:focus{ outline:none; }
+.food-list{ overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:2px; padding-bottom: 4px; }
+.food-item{
+  display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 11px 8px;
+  border-radius: 10px; cursor:pointer; font-size: 15px; color: var(--ink); background:transparent;
+}
+.food-item:active{ background: #f2f0e4; }
+.food-item.selected{ background: rgba(63,107,74,0.10); }
+.food-item .check{ color: var(--primary); font-weight:700; opacity:0; }
+.food-item.selected .check{ opacity:1; }
+.food-item.custom-add{ color: var(--primary-dark); font-weight:600; }
+.no-results{ text-align:center; color: var(--ink-soft); font-size: 13px; padding: 18px 0; font-style: italic; }
+.modal-done{ margin-top: 10px; background: var(--primary); color:#fff; border:none; padding: 12px; border-radius: 10px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Work Sans',sans-serif; }
+
+/* Settings modal specifics */
+.field{ margin-bottom: 14px; }
+.field label{ display:block; font-family:'Space Mono',monospace; font-size: 11px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); margin-bottom: 6px; }
+.field input{
+  width:100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line); background:#f2f0e4;
+  font-family:'Work Sans',sans-serif; font-size: 14.5px; color: var(--ink);
+}
+.field input:focus{ outline: 2px solid var(--primary); outline-offset: 1px; }
+.help-text{ font-size: 12px; color: var(--ink-soft); line-height:1.5; margin: 0 0 16px; }
+.help-text a{ color: var(--primary-dark); }
+.setting-error{ color: var(--berry); font-size: 12.5px; margin: -6px 0 12px; display:none; }
+.setting-error.show{ display:block; }
+
+/* First-run welcome card */
+.welcome-card{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 18px; text-align:center; margin-top: 20px; }
+.welcome-card .icon{ font-size: 34px; margin-bottom: 6px; }
+.welcome-card h2{ font-family:'Fraunces', serif; font-size: 21px; margin: 4px 0 8px; }
+.welcome-card p{ font-size: 13.5px; color: var(--ink-soft); line-height:1.55; margin: 0 0 16px; }
+.welcome-card button{ background: var(--primary); color:#fff; border:none; padding: 12px 22px; border-radius: 10px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Work Sans',sans-serif; }
+
+@media (prefers-reduced-motion: reduce){ *{ transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="eyebrow">Fuori casa · questa settimana</div>
+    <h1>Piano alimentare</h1>
+    <div class="header-actions"><span id="statusPill" class="status-pill err"><span class="dot"></span>non connesso</span></div>
+  </div>
+  <button class="gear-btn" id="gearBtn" aria-label="Impostazioni">⚙️</button>
+</header>
+
+<div class="wrap" id="mainWrap" style="display:none;">
+  <div class="week-nav">
+    <button id="prevWeek" aria-label="Settimana precedente">‹</button>
+    <div class="week-label">
+      <div class="range" id="weekRange">—</div>
+      <button class="today-btn" id="todayBtn">torna a oggi</button>
+    </div>
+    <button id="nextWeek" aria-label="Settimana successiva">›</button>
+  </div>
+
+  <div class="day-tabs" id="dayTabs"></div>
+
+  <div id="panelHost"><div class="loading">caricamento…</div></div>
+
+  <p class="tip">Aggiungi questa pagina alla schermata Home su iPhone (<b>Condividi → Aggiungi a Home</b>) per aprirla come un'app. Il file funziona anche offline, ma per sincronizzare con gli altri serve una connessione a internet.</p>
+</div>
+
+<div class="wrap" id="welcomeWrap" style="display:none;">
+  <div class="welcome-card">
+    <div class="icon">🔗</div>
+    <h2>Collega lo spazio cloud condiviso</h2>
+    <p>Per usare il piano alimentare su più dispositivi o con più persone, collega questo file a un piccolo spazio cloud gratuito (JSONBin.io). Va fatto una sola volta per ogni dispositivo/persona.</p>
+    <button id="welcomeBtn">Configura ora</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Settings modal -->
+<div class="modal-backdrop" id="settingsBackdrop">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><span>Connessione cloud</span><button class="close-x" id="settingsClose">✕</button></div>
+    <p class="help-text">
+      Su <a href="https://jsonbin.io" target="_blank" rel="noopener">jsonbin.io</a> crea un account gratuito, copia la tua <b>X-Master-Key</b> e il <b>Bin ID</b> del bin che hai creato, poi incollali qui sotto. Vanno inseriti una sola volta per ogni dispositivo: usa sempre <b>gli stessi due valori</b> ovunque apri il file, per vedere i dati condivisi.
+    </p>
+    <div class="field">
+      <label for="binIdInput">Bin ID</label>
+      <input type="text" id="binIdInput" placeholder="es. 65a1c2...">
+    </div>
+    <div class="field">
+      <label for="apiKeyInput">X-Master-Key</label>
+      <input type="text" id="apiKeyInput" placeholder="es. $2b$10$...">
+    </div>
+    <div class="setting-error" id="settingsError">Impossibile collegarsi: controlla Bin ID e Master Key.</div>
+    <button class="modal-done" id="settingsSave">Salva e connetti</button>
+  </div>
+</div>
+
+<!-- Food picker modal -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><span id="modalMealLabel">Aggiungi</span><button class="close-x" id="modalClose">✕</button></div>
+    <div class="search-box">
+      <span class="mag">🔎</span>
+      <input type="text" id="searchInput" placeholder="Cerca o scrivi un piatto…" autocomplete="off">
+    </div>
+    <div class="food-list" id="foodList"></div>
+    <button class="modal-done" id="modalDone">Fatto</button>
+  </div>
+</div>
+
+<script>
+const MEALS = [
+  {key:'colazione', label:'Colazione', icon:'☀️'},
+  {key:'spuntino',  label:'Spuntino',  icon:'🍎'},
+  {key:'pranzo',    label:'Pranzo',    icon:'🍽️'},
+  {key:'merenda',   label:'Merenda',   icon:'🍪'},
+  {key:'cena',      label:'Cena',      icon:'🌙'},
+];
+const DOW = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+const DOW_FULL = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
+const MONTHS = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+
+const DEFAULT_FOODS = [
+  "Caffè","Cappuccino","Tè","Latte","Yogurt","Yogurt greco","Fette biscottate","Pane e marmellata",
+  "Pane e miele","Cornetto","Biscotti","Muesli","Fiocchi d'avena","Frutta fresca","Macedonia",
+  "Spremuta d'arancia","Uova strapazzate","Uova sode","Pancake","Frullato proteico",
+  "Mela","Banana","Frutta secca","Yogurt con frutta","Barretta ai cereali","Crackers",
+  "Taralli","Grissini","Frutta secca e semi","Cioccolato fondente",
+  "Pasta al pomodoro","Pasta al pesto","Pasta al ragù","Riso in bianco","Risotto",
+  "Insalata di pollo","Insalata mista","Insalata di riso","Panino","Piadina","Wrap",
+  "Pesce al forno","Salmone alla griglia","Tonno","Pollo alla griglia","Petto di pollo",
+  "Bistecca","Hamburger","Uova al tegame","Frittata","Zuppa di legumi","Minestrone",
+  "Lenticchie","Ceci","Fagioli","Quinoa","Cous cous","Verdure grigliate","Verdure al vapore",
+  "Patate al forno","Pizza","Focaccia","Tramezzino","Sushi","Poke",
+  "Formaggio","Prosciutto e melone","Bresaola","Affettati misti","Caprese",
+  "Minestra di verdure","Passato di verdure","Brodo","Gnocchi","Lasagne","Parmigiana",
+  "Torta salata","Gelato","Frutta cotta","Yogurt magro","Cracker integrali",
+];
+
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function toKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function getMonday(d){
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  date.setDate(date.getDate() + diff);
+  date.setHours(0,0,0,0);
+  return date;
+}
+function addDays(d, n){ const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+function fmtRange(monday){
+  const sunday = addDays(monday,6);
+  const sameMonth = monday.getMonth() === sunday.getMonth();
+  if(sameMonth) return `${monday.getDate()}–${sunday.getDate()} ${MONTHS[monday.getMonth()]} ${monday.getFullYear()}`;
+  return `${monday.getDate()} ${MONTHS[monday.getMonth()]} – ${sunday.getDate()} ${MONTHS[sunday.getMonth()]} ${sunday.getFullYear()}`;
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let weekMonday = getMonday(new Date());
+let selectedIdx = (function(){ const t = new Date().getDay(); return t===0?6:t-1; })();
+let state = { weeks: {}, customFoods: [] };
+let activeMealKey = null;
+let saveTimer = null;
+let config = { binId: null, apiKey: null };
+
+function emptyDay(){ const o = {}; MEALS.forEach(m => o[m.key] = []); return o; }
+function migrateDay(day){
+  const o = emptyDay();
+  MEALS.forEach(m=>{
+    const v = day ? day[m.key] : undefined;
+    if(Array.isArray(v)) o[m.key] = v.slice();
+    else if(typeof v === 'string' && v.trim()) o[m.key] = [v.trim()];
+    else o[m.key] = [];
+  });
+  return o;
+}
+function ensureWeekLoaded(){
+  for(let i=0;i<7;i++){
+    const k = toKey(addDays(weekMonday,i));
+    if(!state.weeks[k]) state.weeks[k] = migrateDay(state.weeks[k]);
+    else state.weeks[k] = migrateDay(state.weeks[k]);
+  }
+}
+function allFoods(){
+  const set = new Set(DEFAULT_FOODS);
+  (state.customFoods||[]).forEach(f=>set.add(f));
+  return Array.from(set);
+}
+
+/* --- Config (local per device, points to shared bin) --- */
+function loadConfig(){
+  try{
+    config.binId = localStorage.getItem('planner_bin_id') || null;
+    config.apiKey = localStorage.getItem('planner_bin_key') || null;
+  }catch(e){ config = {binId:null, apiKey:null}; }
+}
+function saveConfig(binId, apiKey){
+  try{
+    localStorage.setItem('planner_bin_id', binId);
+    localStorage.setItem('planner_bin_key', apiKey);
+  }catch(e){}
+  config.binId = binId; config.apiKey = apiKey;
+}
+
+/* --- JSONBin sync --- */
+async function jsonbinGet(){
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
+    headers: { 'X-Master-Key': config.apiKey }
+  });
+  if(!res.ok) throw new Error('get failed');
+  const data = await res.json();
+  return data.record;
+}
+async function jsonbinPut(record){
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type':'application/json', 'X-Master-Key': config.apiKey },
+    body: JSON.stringify(record)
+  });
+  if(!res.ok) throw new Error('put failed');
+  return res.json();
+}
+
+function setStatus(ok, label){
+  const pill = document.getElementById('statusPill');
+  pill.className = 'status-pill ' + (ok ? 'ok' : 'err');
+  pill.innerHTML = `<span class="dot"></span>${label}`;
+}
+
+async function connectAndLoad(){
+  if(!config.binId || !config.apiKey){
+    document.getElementById('welcomeWrap').style.display = 'block';
+    document.getElementById('mainWrap').style.display = 'none';
+    setStatus(false, 'non connesso');
+    return;
+  }
+  document.getElementById('welcomeWrap').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'block';
+  document.getElementById('panelHost').innerHTML = '<div class="loading">connessione in corso…</div>';
+  try{
+    const record = await jsonbinGet();
+    state.weeks = (record && record.weeks) ? record.weeks : {};
+    state.customFoods = (record && record.customFoods) ? record.customFoods : [];
+    setStatus(true, 'sincronizzato');
+    ensureWeekLoaded();
+    render();
+  }catch(e){
+    setStatus(false, 'errore connessione');
+    document.getElementById('panelHost').innerHTML = '<div class="loading">Impossibile connettersi al cloud.<br>Controlla la connessione o le chiavi (⚙️).</div>';
+  }
+}
+
+function scheduleSave(){
+  setStatus(true, 'salvataggio…');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{
+      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods });
+      setStatus(true, 'sincronizzato');
+    }catch(e){
+      setStatus(false, 'errore salvataggio');
+      showToast('Salvataggio non riuscito, riprovo tra poco');
+      setTimeout(scheduleSave, 4000);
+    }
+  }, 600);
+}
+
+function render(){
+  ensureWeekLoaded();
+  renderTabs();
+  renderPanel();
+  document.getElementById('weekRange').textContent = fmtRange(weekMonday);
+}
+
+function renderTabs(){
+  const host = document.getElementById('dayTabs');
+  host.innerHTML = '';
+  const todayKey = toKey(new Date());
+  for(let i=0;i<7;i++){
+    const d = addDays(weekMonday,i);
+    const k = toKey(d);
+    const isToday = k === todayKey;
+    const isSel = i === selectedIdx;
+    const day = state.weeks[k] || emptyDay();
+    const dotsHtml = MEALS.map(m => `<span class="${day[m.key] && day[m.key].length ? 'filled':''}"></span>`).join('');
+    const tab = document.createElement('div');
+    tab.className = 'day-tab' + (isToday?' is-today':'') + (isSel?' is-selected':'');
+    tab.innerHTML = `<div class="dow">${DOW[i]}</div><div class="num">${d.getDate()}</div><div class="dots">${dotsHtml}</div>`;
+    tab.addEventListener('click', ()=>{ selectedIdx = i; render(); });
+    host.appendChild(tab);
+  }
+  requestAnimationFrame(()=>{
+    const sel = host.querySelector('.is-selected');
+    if(sel) sel.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+  });
+}
+
+function renderDots(){
+  const host = document.getElementById('dayTabs');
+  const tabs = host.querySelectorAll('.day-tab');
+  for(let i=0;i<7;i++){
+    const k = toKey(addDays(weekMonday,i));
+    const day = state.weeks[k] || emptyDay();
+    const dots = tabs[i].querySelectorAll('.dots span');
+    MEALS.forEach((m, idx)=>{
+      if(day[m.key] && day[m.key].length) dots[idx].classList.add('filled');
+      else dots[idx].classList.remove('filled');
+    });
+  }
+}
+
+function currentDayKey(){ return toKey(addDays(weekMonday, selectedIdx)); }
+
+function renderPanel(){
+  const d = addDays(weekMonday, selectedIdx);
+  const k = currentDayKey();
+  const day = state.weeks[k] || (state.weeks[k] = emptyDay());
+  const host = document.getElementById('panelHost');
+
+  const mealsHtml = MEALS.map(m => {
+    const items = day[m.key] || [];
+    const chips = items.map((food, idx) => `
+      <span class="chip">${escapeHtml(food)}<button data-meal="${m.key}" data-idx="${idx}" class="chip-remove" aria-label="Rimuovi">✕</button></span>
+    `).join('');
+    return `
+      <div class="meal">
+        <div class="meal-label"><span class="icon">${m.icon}</span>${m.label}</div>
+        <div class="chips">${chips}<button class="chip-add" data-meal="${m.key}">＋ aggiungi</button></div>
+      </div>
+    `;
+  }).join('');
+
+  host.innerHTML = `
+    <div class="day-panel">
+      <div class="day-title">${DOW_FULL[selectedIdx]} <small>${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</small></div>
+      ${mealsHtml}
+      <div class="actions">
+        <button class="btn-copy" id="copyBtn">Copia il giorno</button>
+        <button class="btn-clear" id="clearBtn">Svuota</button>
+      </div>
+    </div>
+  `;
+
+  host.querySelectorAll('.chip-remove').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const mealKey = btn.dataset.meal;
+      const idx = parseInt(btn.dataset.idx, 10);
+      state.weeks[k][mealKey].splice(idx,1);
+      renderPanel();
+      scheduleSave();
+      renderDots();
+    });
+  });
+  host.querySelectorAll('.chip-add').forEach(btn=>{
+    btn.addEventListener('click', ()=> openPicker(btn.dataset.meal));
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', ()=> copyDay(d,k));
+  document.getElementById('clearBtn').addEventListener('click', ()=> clearDay(k));
+}
+
+/* --- Picker modal --- */
+function openPicker(mealKey){
+  activeMealKey = mealKey;
+  const meal = MEALS.find(m=>m.key===mealKey);
+  document.getElementById('modalMealLabel').textContent = 'Aggiungi a ' + meal.label.toLowerCase();
+  document.getElementById('searchInput').value = '';
+  renderFoodList('');
+  const backdrop = document.getElementById('modalBackdrop');
+  backdrop.classList.add('show');
+  setTimeout(()=> document.getElementById('searchInput').focus(), 150);
+}
+function closePicker(){ document.getElementById('modalBackdrop').classList.remove('show'); activeMealKey = null; }
+
+function renderFoodList(query){
+  const list = document.getElementById('foodList');
+  const q = query.trim().toLowerCase();
+  const k = currentDayKey();
+  const selected = (state.weeks[k][activeMealKey] || []);
+  let foods = allFoods().sort((a,b)=> a.localeCompare(b,'it'));
+  let filtered = q ? foods.filter(f => f.toLowerCase().includes(q)) : foods;
+
+  let html = '';
+  const exactMatch = foods.some(f => f.toLowerCase() === q);
+  if(q && !exactMatch) html += `<div class="food-item custom-add" data-custom="${escapeHtml(query.trim())}">➕ Aggiungi "${escapeHtml(query.trim())}"</div>`;
+  if(filtered.length === 0 && !q) html += `<div class="no-results">Inizia a scrivere per cercare…</div>`;
+  html += filtered.map(f=>{
+    const isSel = selected.includes(f);
+    return `<div class="food-item ${isSel?'selected':''}" data-food="${escapeHtml(f)}"><span>${escapeHtml(f)}</span><span class="check">✓</span></div>`;
+  }).join('');
+  list.innerHTML = html;
+
+  list.querySelectorAll('.food-item[data-food]').forEach(el=> el.addEventListener('click', ()=> toggleFood(el.dataset.food)));
+  list.querySelectorAll('.food-item[data-custom]').forEach(el=> el.addEventListener('click', ()=> addCustomFood(el.dataset.custom)));
+}
+
+function toggleFood(food){
+  const k = currentDayKey();
+  const arr = state.weeks[k][activeMealKey];
+  const idx = arr.indexOf(food);
+  if(idx >= 0) arr.splice(idx,1); else arr.push(food);
+  renderFoodList(document.getElementById('searchInput').value);
+  renderPanel();
+  scheduleSave();
+  renderDots();
+}
+
+function addCustomFood(text){
+  if(!text) return;
+  if(!state.customFoods.includes(text)) state.customFoods.push(text);
+  toggleFood(text);
+  document.getElementById('searchInput').value = '';
+  renderFoodList('');
+}
+
+document.getElementById('searchInput').addEventListener('input', (e)=> renderFoodList(e.target.value));
+document.getElementById('modalClose').addEventListener('click', closePicker);
+document.getElementById('modalDone').addEventListener('click', closePicker);
+document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id === 'modalBackdrop') closePicker(); });
+
+async function copyDay(d,k){
+  const day = state.weeks[k] || emptyDay();
+  const lines = [`${DOW_FULL[selectedIdx]} ${d.getDate()} ${MONTHS[d.getMonth()]}`];
+  MEALS.forEach(m=>{
+    const items = day[m.key] || [];
+    lines.push(`${m.label}: ${items.length ? items.join(', ') : '–'}`);
+  });
+  const text = lines.join('\n');
+  try{ await navigator.clipboard.writeText(text); showToast('Copiato negli appunti'); }
+  catch(e){ showToast('Copia non riuscita'); }
+}
+
+function clearDay(k){
+  state.weeks[k] = emptyDay();
+  renderPanel();
+  scheduleSave();
+  renderDots();
+  showToast('Giorno svuotato');
+}
+
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+document.getElementById('prevWeek').addEventListener('click', ()=>{ weekMonday = addDays(weekMonday, -7); render(); });
+document.getElementById('nextWeek').addEventListener('click', ()=>{ weekMonday = addDays(weekMonday, 7); render(); });
+document.getElementById('todayBtn').addEventListener('click', ()=>{
+  weekMonday = getMonday(new Date());
+  const t = new Date().getDay();
+  selectedIdx = t===0?6:t-1;
+  render();
+});
+
+/* --- Settings modal --- */
+function openSettings(){
+  document.getElementById('binIdInput').value = config.binId || '';
+  document.getElementById('apiKeyInput').value = config.apiKey || '';
+  document.getElementById('settingsError').classList.remove('show');
+  document.getElementById('settingsBackdrop').classList.add('show');
+}
+function closeSettings(){ document.getElementById('settingsBackdrop').classList.remove('show'); }
+
+document.getElementById('gearBtn').addEventListener('click', openSettings);
+document.getElementById('welcomeBtn').addEventListener('click', openSettings);
+document.getElementById('settingsClose').addEventListener('click', closeSettings);
+document.getElementById('settingsBackdrop').addEventListener('click', (e)=>{ if(e.target.id === 'settingsBackdrop') closeSettings(); });
+
+document.getElementById('settingsSave').addEventListener('click', async ()=>{
+  const binId = document.getElementById('binIdInput').value.trim();
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  const errEl = document.getElementById('settingsError');
+  if(!binId || !apiKey){
+    errEl.textContent = 'Inserisci sia il Bin ID che la Master Key.';
+    errEl.classList.add('show');
+    return;
+  }
+  const btn = document.getElementById('settingsSave');
+  const prevLabel = btn.textContent;
+  btn.textContent = 'Connessione…';
+  btn.disabled = true;
+  const prevConfig = {...config};
+  saveConfig(binId, apiKey);
+  try{
+    const record = await jsonbinGet();
+    // valid connection
+    state.weeks = (record && record.weeks) ? record.weeks : {};
+    state.customFoods = (record && record.customFoods) ? record.customFoods : [];
+    closeSettings();
+    document.getElementById('welcomeWrap').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'block';
+    setStatus(true, 'sincronizzato');
+    render();
+  }catch(e){
+    saveConfig(prevConfig.binId, prevConfig.apiKey);
+    errEl.textContent = 'Impossibile collegarsi: controlla Bin ID e Master Key.';
+    errEl.classList.add('show');
+  }
+  btn.textContent = prevLabel;
+  btn.disabled = false;
+});
+
+(function init(){
+  loadConfig();
+  connectAndLoad();
+})();
+</script>
+</body>
+</html>
