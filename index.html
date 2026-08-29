@@ -98,8 +98,15 @@ h1{
 .day-tab.is-selected .dots span.filled{ background: var(--accent); }
 
 .day-panel{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 16px 14px; margin-top: 4px; }
-.day-panel .day-title{ font-family:'Fraunces', serif; font-size: 22px; font-weight: 600; margin: 0 0 14px; display:flex; align-items:baseline; justify-content:space-between; gap: 8px; }
+.day-panel .day-title{ font-family:'Fraunces', serif; font-size: 22px; font-weight: 600; margin: 0 0 12px; display:flex; align-items:baseline; justify-content:space-between; gap: 8px; }
 .day-panel .day-title small{ font-family:'Space Mono', monospace; font-size: 12px; font-weight: 400; color: var(--ink-soft); }
+
+.people-row{ display:flex; align-items:center; justify-content:space-between; margin: 0 0 14px; }
+.people-label{ font-family:'Space Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); }
+.people-stepper{ display:flex; align-items:center; gap:10px; background:#f2f0e4; border:1px solid var(--line); border-radius:999px; padding:4px 6px; }
+.people-stepper button{ width:24px;height:24px;border-radius:50%;border:none;background:var(--card); color:var(--primary-dark); font-size:15px; cursor:pointer; display:flex;align-items:center;justify-content:center; }
+.people-stepper button:active{ transform: scale(0.9); }
+.people-stepper span{ font-family:'Space Mono',monospace; font-weight:700; min-width:16px; text-align:center; font-size:14px; }
 
 .meal{ border-top: 1px dashed var(--line); padding: 13px 0; }
 .meal:first-of-type{ border-top: none; padding-top: 0; }
@@ -111,6 +118,8 @@ h1{
   display:flex; align-items:center; gap:6px; background: #f2f0e4; border: 1px solid var(--line);
   border-radius: 999px; padding: 6px 6px 6px 12px; font-size: 13.5px; color: var(--ink); line-height:1.2;
 }
+.chip-food{ cursor:pointer; }
+.chip-qty{ color: var(--ink-soft); font-weight:500; }
 .chip button{
   border:none; background: rgba(162,77,77,0.12); color: var(--berry); width:18px; height:18px;
   border-radius:50%; font-size: 12px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
@@ -146,28 +155,28 @@ h1{
 .loading{ text-align:center; color: var(--ink-soft); font-family:'Space Mono',monospace; font-size: 12px; padding: 30px 0; }
 
 .modal-backdrop{
-  position: fixed; inset:0; background: rgba(38,36,33,0.45); display:flex; align-items:flex-end;
+  position: fixed; left:0; top:0; width:100%; height:100%; background: rgba(38,36,33,0.45); display:flex; align-items:flex-end;
   justify-content:center; z-index: 100; opacity:0; pointer-events:none; transition: opacity .2s ease;
 }
 .modal-backdrop.show{ opacity:1; pointer-events:auto; }
 .modal{
   background: var(--card); width: 100%; max-width: 560px; border-radius: 20px 20px 0 0;
-  padding: 16px 16px 20px; max-height: 82vh; display:flex; flex-direction:column;
+  padding: 16px 16px 20px; max-height: 90%; display:flex; flex-direction:column;
   transform: translateY(16px); transition: transform .2s ease;
   box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
 }
 .modal-backdrop.show .modal{ transform: translateY(0); }
-.modal-handle{ width:36px; height:4px; background: var(--line); border-radius: 4px; margin: 0 auto 12px; }
-.modal-title{ font-family:'Fraunces', serif; font-size: 18px; font-weight:600; margin: 0 0 12px; display:flex; align-items:center; justify-content:space-between; }
+.modal-handle{ width:36px; height:4px; background: var(--line); border-radius: 4px; margin: 0 auto 12px; flex:0 0 auto; }
+.modal-title{ font-family:'Fraunces', serif; font-size: 18px; font-weight:600; margin: 0 0 12px; display:flex; align-items:center; justify-content:space-between; flex:0 0 auto; }
 .modal-title .close-x{ border:none; background:none; font-size: 20px; color: var(--ink-soft); cursor:pointer; padding:4px; line-height:1; }
 .search-box{
   display:flex; align-items:center; gap:8px; background:#f2f0e4; border: 1px solid var(--line);
-  border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+  border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; flex:0 0 auto;
 }
 .search-box .mag{ color: var(--ink-soft); font-size:14px; }
-.search-box input{ flex:1; border:none; background:transparent; font-family:'Work Sans',sans-serif; font-size: 15px; color: var(--ink); }
+.search-box input{ flex:1; border:none; background:transparent; font-family:'Work Sans',sans-serif; font-size: 16px; color: var(--ink); }
 .search-box input:focus{ outline:none; }
-.food-list{ overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:2px; padding-bottom: 4px; }
+.food-list{ overflow-y:auto; flex:1 1 auto; display:flex; flex-direction:column; gap:2px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
 .food-item{
   display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 11px 8px;
   border-radius: 10px; cursor:pointer; font-size: 15px; color: var(--ink); background:transparent;
@@ -178,22 +187,21 @@ h1{
 .food-item.selected .check{ opacity:1; }
 .food-item.custom-add{ color: var(--primary-dark); font-weight:600; }
 .no-results{ text-align:center; color: var(--ink-soft); font-size: 13px; padding: 18px 0; font-style: italic; }
-.modal-done{ margin-top: 10px; background: var(--primary); color:#fff; border:none; padding: 12px; border-radius: 10px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Work Sans',sans-serif; }
+.modal-done{ margin-top: 10px; background: var(--primary); color:#fff; border:none; padding: 12px; border-radius: 10px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Work Sans',sans-serif; flex:0 0 auto; }
 
-/* Settings modal specifics */
-.field{ margin-bottom: 14px; }
+.field{ margin-bottom: 14px; flex: 0 0 auto; }
 .field label{ display:block; font-family:'Space Mono',monospace; font-size: 11px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); margin-bottom: 6px; }
 .field input{
   width:100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line); background:#f2f0e4;
-  font-family:'Work Sans',sans-serif; font-size: 14.5px; color: var(--ink);
+  font-family:'Work Sans',sans-serif; font-size: 16px; color: var(--ink);
 }
 .field input:focus{ outline: 2px solid var(--primary); outline-offset: 1px; }
-.help-text{ font-size: 12px; color: var(--ink-soft); line-height:1.5; margin: 0 0 16px; }
+.help-text{ font-size: 12px; color: var(--ink-soft); line-height:1.5; margin: 0 0 16px; flex:0 0 auto; }
 .help-text a{ color: var(--primary-dark); }
-.setting-error{ color: var(--berry); font-size: 12.5px; margin: -6px 0 12px; display:none; }
+.setting-error{ color: var(--berry); font-size: 12.5px; margin: -6px 0 12px; display:none; flex:0 0 auto; }
 .setting-error.show{ display:block; }
+.qty-helper{ font-size: 12px; color: var(--ink-soft); margin: -8px 0 14px; font-family:'Space Mono',monospace; min-height:14px; flex:0 0 auto; }
 
-/* First-run welcome card */
 .welcome-card{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 18px; text-align:center; margin-top: 20px; }
 .welcome-card .icon{ font-size: 34px; margin-bottom: 6px; }
 .welcome-card h2{ font-family:'Fraunces', serif; font-size: 21px; margin: 4px 0 8px; }
@@ -227,7 +235,7 @@ h1{
 
   <div id="panelHost"><div class="loading">caricamento…</div></div>
 
-  <p class="tip">Aggiungi questa pagina alla schermata Home su iPhone (<b>Condividi → Aggiungi a Home</b>) per aprirla come un'app. Il file funziona anche offline, ma per sincronizzare con gli altri serve una connessione a internet.</p>
+  <p class="tip">Aggiungi questa pagina alla schermata Home su iPhone (<b>Condividi → Aggiungi a Home</b>) per aprirla come un'app.</p>
 </div>
 
 <div class="wrap" id="welcomeWrap" style="display:none;">
@@ -247,7 +255,7 @@ h1{
     <div class="modal-handle"></div>
     <div class="modal-title"><span>Connessione cloud</span><button class="close-x" id="settingsClose">✕</button></div>
     <p class="help-text">
-      Su <a href="https://jsonbin.io" target="_blank" rel="noopener">jsonbin.io</a> crea un account gratuito, copia la tua <b>X-Master-Key</b> e il <b>Bin ID</b> del bin che hai creato, poi incollali qui sotto. Vanno inseriti una sola volta per ogni dispositivo: usa sempre <b>gli stessi due valori</b> ovunque apri il file, per vedere i dati condivisi.
+      Su <a href="https://jsonbin.io" target="_blank" rel="noopener">jsonbin.io</a> crea un account gratuito, copia la tua <b>X-Master-Key</b> e il <b>Bin ID</b> del bin che hai creato, poi incollali qui sotto. Usa sempre <b>gli stessi due valori</b> su ogni dispositivo, per vedere i dati condivisi.
     </p>
     <div class="field">
       <label for="binIdInput">Bin ID</label>
@@ -273,6 +281,20 @@ h1{
     </div>
     <div class="food-list" id="foodList"></div>
     <button class="modal-done" id="modalDone">Fatto</button>
+  </div>
+</div>
+
+<!-- Quantity modal -->
+<div class="modal-backdrop" id="qtyBackdrop">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><span id="qtyFoodLabel">Quantità</span><button class="close-x" id="qtyClose">✕</button></div>
+    <div class="field">
+      <label for="qtyInput">Quantità per persona</label>
+      <input type="text" id="qtyInput" placeholder="es. 80g, 1 fetta, 2 cucchiai" autocomplete="off">
+    </div>
+    <div class="qty-helper" id="qtyHelper"></div>
+    <button class="modal-done" id="qtySave">Salva</button>
   </div>
 </div>
 
@@ -328,25 +350,35 @@ let weekMonday = getMonday(new Date());
 let selectedIdx = (function(){ const t = new Date().getDay(); return t===0?6:t-1; })();
 let state = { weeks: {}, customFoods: [] };
 let activeMealKey = null;
+let qtyTarget = null;
 let saveTimer = null;
 let config = { binId: null, apiKey: null };
 
-function emptyDay(){ const o = {}; MEALS.forEach(m => o[m.key] = []); return o; }
+function emptyDay(){
+  const o = {};
+  MEALS.forEach(m => o[m.key] = []);
+  o.people = 1;
+  return o;
+}
+function migrateItems(arr){
+  if(!Array.isArray(arr)) return [];
+  return arr.map(it=>{
+    if(typeof it === 'string') return { food: it, qty: '' };
+    if(it && typeof it === 'object') return { food: it.food || '', qty: it.qty || '' };
+    return null;
+  }).filter(it => it && it.food);
+}
 function migrateDay(day){
   const o = emptyDay();
-  MEALS.forEach(m=>{
-    const v = day ? day[m.key] : undefined;
-    if(Array.isArray(v)) o[m.key] = v.slice();
-    else if(typeof v === 'string' && v.trim()) o[m.key] = [v.trim()];
-    else o[m.key] = [];
-  });
+  MEALS.forEach(m=>{ o[m.key] = migrateItems(day ? day[m.key] : undefined); });
+  const p = day && Number(day.people);
+  o.people = (p && p > 0) ? p : 1;
   return o;
 }
 function ensureWeekLoaded(){
   for(let i=0;i<7;i++){
     const k = toKey(addDays(weekMonday,i));
-    if(!state.weeks[k]) state.weeks[k] = migrateDay(state.weeks[k]);
-    else state.weeks[k] = migrateDay(state.weeks[k]);
+    state.weeks[k] = migrateDay(state.weeks[k]);
   }
 }
 function allFoods(){
@@ -355,7 +387,7 @@ function allFoods(){
   return Array.from(set);
 }
 
-/* --- Config (local per device, points to shared bin) --- */
+/* --- Config --- */
 function loadConfig(){
   try{
     config.binId = localStorage.getItem('planner_bin_id') || null;
@@ -372,9 +404,7 @@ function saveConfig(binId, apiKey){
 
 /* --- JSONBin sync --- */
 async function jsonbinGet(){
-  const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
-    headers: { 'X-Master-Key': config.apiKey }
-  });
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, { headers: { 'X-Master-Key': config.apiKey } });
   if(!res.ok) throw new Error('get failed');
   const data = await res.json();
   return data.record;
@@ -484,11 +514,15 @@ function renderPanel(){
   const k = currentDayKey();
   const day = state.weeks[k] || (state.weeks[k] = emptyDay());
   const host = document.getElementById('panelHost');
+  const people = day.people || 1;
 
   const mealsHtml = MEALS.map(m => {
     const items = day[m.key] || [];
-    const chips = items.map((food, idx) => `
-      <span class="chip">${escapeHtml(food)}<button data-meal="${m.key}" data-idx="${idx}" class="chip-remove" aria-label="Rimuovi">✕</button></span>
+    const chips = items.map((item, idx) => `
+      <span class="chip">
+        <span class="chip-food" data-meal="${m.key}" data-idx="${idx}">${escapeHtml(item.food)}${item.qty ? ` <span class="chip-qty">· ${escapeHtml(item.qty)}</span>` : ''}</span>
+        <button data-meal="${m.key}" data-idx="${idx}" class="chip-remove" aria-label="Rimuovi">✕</button>
+      </span>
     `).join('');
     return `
       <div class="meal">
@@ -501,6 +535,14 @@ function renderPanel(){
   host.innerHTML = `
     <div class="day-panel">
       <div class="day-title">${DOW_FULL[selectedIdx]} <small>${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</small></div>
+      <div class="people-row">
+        <span class="people-label">Persone a tavola</span>
+        <div class="people-stepper">
+          <button id="peopleDec" aria-label="Diminuisci">−</button>
+          <span id="peopleCount">${people}</span>
+          <button id="peopleInc" aria-label="Aumenta">+</button>
+        </div>
+      </div>
       ${mealsHtml}
       <div class="actions">
         <button class="btn-copy" id="copyBtn">Copia il giorno</button>
@@ -519,32 +561,84 @@ function renderPanel(){
       renderDots();
     });
   });
+  host.querySelectorAll('.chip-food').forEach(el=>{
+    el.addEventListener('click', ()=> openQtyEditor(el.dataset.meal, parseInt(el.dataset.idx,10)));
+  });
   host.querySelectorAll('.chip-add').forEach(btn=>{
     btn.addEventListener('click', ()=> openPicker(btn.dataset.meal));
   });
+  document.getElementById('peopleDec').addEventListener('click', ()=> changePeople(k, -1));
+  document.getElementById('peopleInc').addEventListener('click', ()=> changePeople(k, 1));
 
   document.getElementById('copyBtn').addEventListener('click', ()=> copyDay(d,k));
   document.getElementById('clearBtn').addEventListener('click', ()=> clearDay(k));
 }
 
-/* --- Picker modal --- */
+function changePeople(k, delta){
+  const day = state.weeks[k];
+  const next = Math.max(1, Math.min(30, (day.people||1) + delta));
+  day.people = next;
+  renderPanel();
+  scheduleSave();
+}
+
+/* --- Modal viewport handling (keeps modals above the iOS keyboard) --- */
+let openModalId = null;
+function adjustModalViewport(){
+  const vv = window.visualViewport;
+  document.querySelectorAll('.modal-backdrop').forEach(bd=>{
+    if(vv){
+      bd.style.height = vv.height + 'px';
+      bd.style.top = vv.offsetTop + 'px';
+    }
+  });
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', adjustModalViewport);
+  window.visualViewport.addEventListener('scroll', adjustModalViewport);
+}
+function lockBodyScroll(lock){
+  if(lock){
+    state._scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-state._scrollY) + 'px';
+    document.body.style.width = '100%';
+  } else {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    window.scrollTo(0, state._scrollY || 0);
+  }
+}
+function showModal(id){
+  openModalId = id;
+  adjustModalViewport();
+  document.getElementById(id).classList.add('show');
+  lockBodyScroll(true);
+}
+function hideModal(id){
+  document.getElementById(id).classList.remove('show');
+  openModalId = null;
+  lockBodyScroll(false);
+}
+
+/* --- Food picker modal --- */
 function openPicker(mealKey){
   activeMealKey = mealKey;
   const meal = MEALS.find(m=>m.key===mealKey);
   document.getElementById('modalMealLabel').textContent = 'Aggiungi a ' + meal.label.toLowerCase();
   document.getElementById('searchInput').value = '';
   renderFoodList('');
-  const backdrop = document.getElementById('modalBackdrop');
-  backdrop.classList.add('show');
+  showModal('modalBackdrop');
   setTimeout(()=> document.getElementById('searchInput').focus(), 150);
 }
-function closePicker(){ document.getElementById('modalBackdrop').classList.remove('show'); activeMealKey = null; }
+function closePicker(){ hideModal('modalBackdrop'); activeMealKey = null; }
 
 function renderFoodList(query){
   const list = document.getElementById('foodList');
   const q = query.trim().toLowerCase();
   const k = currentDayKey();
-  const selected = (state.weeks[k][activeMealKey] || []);
+  const selected = (state.weeks[k][activeMealKey] || []).map(it=>it.food);
   let foods = allFoods().sort((a,b)=> a.localeCompare(b,'it'));
   let filtered = q ? foods.filter(f => f.toLowerCase().includes(q)) : foods;
 
@@ -565,8 +659,9 @@ function renderFoodList(query){
 function toggleFood(food){
   const k = currentDayKey();
   const arr = state.weeks[k][activeMealKey];
-  const idx = arr.indexOf(food);
-  if(idx >= 0) arr.splice(idx,1); else arr.push(food);
+  const idx = arr.findIndex(it => it.food === food);
+  if(idx >= 0) arr.splice(idx,1);
+  else arr.push({ food, qty: '' });
   renderFoodList(document.getElementById('searchInput').value);
   renderPanel();
   scheduleSave();
@@ -586,12 +681,60 @@ document.getElementById('modalClose').addEventListener('click', closePicker);
 document.getElementById('modalDone').addEventListener('click', closePicker);
 document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id === 'modalBackdrop') closePicker(); });
 
+/* --- Quantity modal --- */
+function openQtyEditor(mealKey, idx){
+  const k = currentDayKey();
+  const item = state.weeks[k][mealKey][idx];
+  if(!item) return;
+  qtyTarget = { mealKey, idx };
+  document.getElementById('qtyFoodLabel').textContent = item.food;
+  document.getElementById('qtyInput').value = item.qty || '';
+  updateQtyHelper();
+  showModal('qtyBackdrop');
+  setTimeout(()=> document.getElementById('qtyInput').focus(), 150);
+}
+function closeQty(){ hideModal('qtyBackdrop'); qtyTarget = null; }
+function updateQtyHelper(){
+  const k = currentDayKey();
+  const day = state.weeks[k];
+  const people = (day && day.people) || 1;
+  const val = document.getElementById('qtyInput').value.trim();
+  const helper = document.getElementById('qtyHelper');
+  const match = val.match(/^([\d]+(?:[.,]\d+)?)\s*(.*)$/);
+  if(match && people > 1){
+    const num = parseFloat(match[1].replace(',','.'));
+    const unit = match[2] || '';
+    const total = num * people;
+    const totalStr = Number.isInteger(total) ? total : total.toFixed(1);
+    helper.textContent = `≈ ${totalStr}${unit ? ' '+unit : ''} totali per ${people} persone`;
+  } else if(people > 1){
+    helper.textContent = `Per ${people} persone`;
+  } else {
+    helper.textContent = '';
+  }
+}
+document.getElementById('qtyInput').addEventListener('input', updateQtyHelper);
+document.getElementById('qtyClose').addEventListener('click', closeQty);
+document.getElementById('qtyBackdrop').addEventListener('click', (e)=>{ if(e.target.id === 'qtyBackdrop') closeQty(); });
+document.getElementById('qtySave').addEventListener('click', ()=>{
+  if(!qtyTarget) return;
+  const k = currentDayKey();
+  const val = document.getElementById('qtyInput').value.trim();
+  const item = state.weeks[k][qtyTarget.mealKey][qtyTarget.idx];
+  if(item) item.qty = val;
+  closeQty();
+  renderPanel();
+  scheduleSave();
+});
+
 async function copyDay(d,k){
   const day = state.weeks[k] || emptyDay();
   const lines = [`${DOW_FULL[selectedIdx]} ${d.getDate()} ${MONTHS[d.getMonth()]}`];
+  if(day.people && day.people > 1) lines.push(`Persone: ${day.people}`);
   MEALS.forEach(m=>{
     const items = day[m.key] || [];
-    lines.push(`${m.label}: ${items.length ? items.join(', ') : '–'}`);
+    const text = items.length ? items.map(it => it.qty ? `${it.food} (${it.qty})` : it.food).join(', ') : '–';
+    lines.push(`${m.label}: ${text}`);
   });
   const text = lines.join('\n');
   try{ await navigator.clipboard.writeText(text); showToast('Copiato negli appunti'); }
@@ -629,9 +772,9 @@ function openSettings(){
   document.getElementById('binIdInput').value = config.binId || '';
   document.getElementById('apiKeyInput').value = config.apiKey || '';
   document.getElementById('settingsError').classList.remove('show');
-  document.getElementById('settingsBackdrop').classList.add('show');
+  showModal('settingsBackdrop');
 }
-function closeSettings(){ document.getElementById('settingsBackdrop').classList.remove('show'); }
+function closeSettings(){ hideModal('settingsBackdrop'); }
 
 document.getElementById('gearBtn').addEventListener('click', openSettings);
 document.getElementById('welcomeBtn').addEventListener('click', openSettings);
@@ -655,7 +798,6 @@ document.getElementById('settingsSave').addEventListener('click', async ()=>{
   saveConfig(binId, apiKey);
   try{
     const record = await jsonbinGet();
-    // valid connection
     state.weeks = (record && record.weeks) ? record.weeks : {};
     state.customFoods = (record && record.customFoods) ? record.customFoods : [];
     closeSettings();
