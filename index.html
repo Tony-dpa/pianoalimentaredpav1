@@ -98,20 +98,19 @@ h1{
 .day-tab.is-selected .dots span.filled{ background: var(--accent); }
 
 .day-panel{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 16px 14px; margin-top: 4px; }
-.day-panel .day-title{ font-family:'Fraunces', serif; font-size: 22px; font-weight: 600; margin: 0 0 12px; display:flex; align-items:baseline; justify-content:space-between; gap: 8px; }
+.day-panel .day-title{ font-family:'Fraunces', serif; font-size: 22px; font-weight: 600; margin: 0 0 14px; display:flex; align-items:baseline; justify-content:space-between; gap: 8px; }
 .day-panel .day-title small{ font-family:'Space Mono', monospace; font-size: 12px; font-weight: 400; color: var(--ink-soft); }
-
-.people-row{ display:flex; align-items:center; justify-content:space-between; margin: 0 0 14px; }
-.people-label{ font-family:'Space Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); }
-.people-stepper{ display:flex; align-items:center; gap:10px; background:#f2f0e4; border:1px solid var(--line); border-radius:999px; padding:4px 6px; }
-.people-stepper button{ width:24px;height:24px;border-radius:50%;border:none;background:var(--card); color:var(--primary-dark); font-size:15px; cursor:pointer; display:flex;align-items:center;justify-content:center; }
-.people-stepper button:active{ transform: scale(0.9); }
-.people-stepper span{ font-family:'Space Mono',monospace; font-weight:700; min-width:16px; text-align:center; font-size:14px; }
 
 .meal{ border-top: 1px dashed var(--line); padding: 13px 0; }
 .meal:first-of-type{ border-top: none; padding-top: 0; }
-.meal-label{ display:flex; align-items:center; gap:8px; font-family:'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; margin-bottom: 9px; }
+.meal-label-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 9px; }
+.meal-label{ display:flex; align-items:center; gap:8px; font-family:'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; }
 .meal-label .icon{ font-size: 14px; }
+
+.people-stepper{ display:flex; align-items:center; gap:8px; background:#f2f0e4; border:1px solid var(--line); border-radius:999px; padding:3px 5px; flex:0 0 auto; }
+.people-stepper button{ width:20px;height:20px;border-radius:50%;border:none;background:var(--card); color:var(--primary-dark); font-size:13px; cursor:pointer; display:flex;align-items:center;justify-content:center; line-height:1; }
+.people-stepper button:active{ transform: scale(0.9); }
+.people-stepper .pcount{ font-family:'Space Mono',monospace; font-weight:700; min-width:12px; text-align:center; font-size:12px; display:flex; align-items:center; gap:3px; }
 
 .chips{ display:flex; flex-wrap:wrap; gap: 7px; align-items:center; }
 .chip{
@@ -178,12 +177,16 @@ h1{
 .search-box input:focus{ outline:none; }
 .food-list{ overflow-y:auto; flex:1 1 auto; display:flex; flex-direction:column; gap:2px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
 .food-item{
-  display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 11px 8px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 9px 6px 9px 10px;
   border-radius: 10px; cursor:pointer; font-size: 15px; color: var(--ink); background:transparent;
 }
 .food-item:active{ background: #f2f0e4; }
 .food-item.selected{ background: rgba(63,107,74,0.10); }
-.food-item .check{ color: var(--primary); font-weight:700; opacity:0; }
+.food-item-text{ flex:1; }
+.food-item-actions{ display:flex; align-items:center; gap:4px; flex:0 0 auto; }
+.ficon{ background:none; border:none; font-size:14px; cursor:pointer; padding:5px; opacity:0.55; line-height:1; }
+.ficon:active{ opacity:1; }
+.food-item .check{ color: var(--primary); font-weight:700; opacity:0; width:14px; text-align:center; }
 .food-item.selected .check{ opacity:1; }
 .food-item.custom-add{ color: var(--primary-dark); font-weight:600; }
 .no-results{ text-align:center; color: var(--ink-soft); font-size: 13px; padding: 18px 0; font-style: italic; }
@@ -191,11 +194,13 @@ h1{
 
 .field{ margin-bottom: 14px; flex: 0 0 auto; }
 .field label{ display:block; font-family:'Space Mono',monospace; font-size: 11px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); margin-bottom: 6px; }
-.field input{
+.field input, .field select{
   width:100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line); background:#f2f0e4;
   font-family:'Work Sans',sans-serif; font-size: 16px; color: var(--ink);
 }
-.field input:focus{ outline: 2px solid var(--primary); outline-offset: 1px; }
+.field input:focus, .field select:focus{ outline: 2px solid var(--primary); outline-offset: 1px; }
+.qty-row{ display:flex; gap:10px; flex:0 0 auto; }
+.qty-row .field{ flex:1; margin-bottom:14px; }
 .help-text{ font-size: 12px; color: var(--ink-soft); line-height:1.5; margin: 0 0 16px; flex:0 0 auto; }
 .help-text a{ color: var(--primary-dark); }
 .setting-error{ color: var(--berry); font-size: 12.5px; margin: -6px 0 12px; display:none; flex:0 0 auto; }
@@ -284,14 +289,38 @@ h1{
   </div>
 </div>
 
-<!-- Quantity modal -->
+<!-- Quantity / edit item modal -->
 <div class="modal-backdrop" id="qtyBackdrop">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title"><span id="qtyFoodLabel">Quantità</span><button class="close-x" id="qtyClose">✕</button></div>
+    <div class="modal-title"><span>Modifica alimento</span><button class="close-x" id="qtyClose">✕</button></div>
     <div class="field">
-      <label for="qtyInput">Quantità per persona</label>
-      <input type="text" id="qtyInput" placeholder="es. 80g, 1 fetta, 2 cucchiai" autocomplete="off">
+      <label for="qtyFoodInput">Nome alimento</label>
+      <input type="text" id="qtyFoodInput" placeholder="Nome alimento" autocomplete="off">
+    </div>
+    <div class="qty-row">
+      <div class="field">
+        <label for="qtyValueInput">Quantità (a persona)</label>
+        <input type="text" inputmode="decimal" id="qtyValueInput" placeholder="es. 80">
+      </div>
+      <div class="field">
+        <label for="qtyUnitSelect">Unità</label>
+        <select id="qtyUnitSelect">
+          <option value="">—</option>
+          <option value="g">g</option>
+          <option value="kg">kg</option>
+          <option value="ml">ml</option>
+          <option value="l">l</option>
+          <option value="pz">pz</option>
+          <option value="fetta/e">fetta/e</option>
+          <option value="cucchiaio/i">cucchiaio/i</option>
+          <option value="cucchiaino/i">cucchiaino/i</option>
+          <option value="tazza/e">tazza/e</option>
+          <option value="porzione/i">porzione/i</option>
+          <option value="manciata">manciata</option>
+          <option value="q.b.">q.b.</option>
+        </select>
+      </div>
     </div>
     <div class="qty-helper" id="qtyHelper"></div>
     <button class="modal-done" id="qtySave">Salva</button>
@@ -348,7 +377,7 @@ function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 
 let weekMonday = getMonday(new Date());
 let selectedIdx = (function(){ const t = new Date().getDay(); return t===0?6:t-1; })();
-let state = { weeks: {}, customFoods: [] };
+let state = { weeks: {}, customFoods: [], removedDefaults: [] };
 let activeMealKey = null;
 let qtyTarget = null;
 let saveTimer = null;
@@ -357,22 +386,36 @@ let config = { binId: null, apiKey: null };
 function emptyDay(){
   const o = {};
   MEALS.forEach(m => o[m.key] = []);
-  o.people = 1;
+  o.peopleByMeal = {};
+  MEALS.forEach(m => o.peopleByMeal[m.key] = 1);
   return o;
 }
 function migrateItems(arr){
   if(!Array.isArray(arr)) return [];
   return arr.map(it=>{
-    if(typeof it === 'string') return { food: it, qty: '' };
-    if(it && typeof it === 'object') return { food: it.food || '', qty: it.qty || '' };
+    if(typeof it === 'string') return { food: it, qtyValue: '', qtyUnit: '' };
+    if(it && typeof it === 'object'){
+      if('qtyValue' in it || 'qtyUnit' in it){
+        return { food: it.food || '', qtyValue: it.qtyValue || '', qtyUnit: it.qtyUnit || '' };
+      }
+      // legacy single "qty" text field: try to split into value + unit
+      const legacy = (it.qty || '').trim();
+      const m = legacy.match(/^([\d]+(?:[.,]\d+)?)\s*(.*)$/);
+      if(m){ return { food: it.food || '', qtyValue: m[1].replace(',', '.'), qtyUnit: m[2] || '' }; }
+      return { food: it.food || '', qtyValue: '', qtyUnit: legacy };
+    }
     return null;
   }).filter(it => it && it.food);
 }
 function migrateDay(day){
   const o = emptyDay();
   MEALS.forEach(m=>{ o[m.key] = migrateItems(day ? day[m.key] : undefined); });
-  const p = day && Number(day.people);
-  o.people = (p && p > 0) ? p : 1;
+  MEALS.forEach(m=>{
+    let p;
+    if(day && day.peopleByMeal && Number(day.peopleByMeal[m.key])) p = Number(day.peopleByMeal[m.key]);
+    else if(day && Number(day.people)) p = Number(day.people); // legacy single day-level count
+    o.peopleByMeal[m.key] = (p && p > 0) ? p : 1;
+  });
   return o;
 }
 function ensureWeekLoaded(){
@@ -382,7 +425,8 @@ function ensureWeekLoaded(){
   }
 }
 function allFoods(){
-  const set = new Set(DEFAULT_FOODS);
+  const hidden = state.removedDefaults || [];
+  const set = new Set(DEFAULT_FOODS.filter(f => !hidden.includes(f)));
   (state.customFoods||[]).forEach(f=>set.add(f));
   return Array.from(set);
 }
@@ -439,6 +483,7 @@ async function connectAndLoad(){
     const record = await jsonbinGet();
     state.weeks = (record && record.weeks) ? record.weeks : {};
     state.customFoods = (record && record.customFoods) ? record.customFoods : [];
+    state.removedDefaults = (record && record.removedDefaults) ? record.removedDefaults : [];
     setStatus(true, 'sincronizzato');
     ensureWeekLoaded();
     render();
@@ -453,7 +498,7 @@ function scheduleSave(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async ()=>{
     try{
-      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods });
+      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods, removedDefaults: state.removedDefaults });
       setStatus(true, 'sincronizzato');
     }catch(e){
       setStatus(false, 'errore salvataggio');
@@ -509,24 +554,38 @@ function renderDots(){
 
 function currentDayKey(){ return toKey(addDays(weekMonday, selectedIdx)); }
 
+function fmtQty(item){
+  if(!item.qtyValue && !item.qtyUnit) return '';
+  return `${item.qtyValue||''}${item.qtyUnit ? ' '+item.qtyUnit : ''}`.trim();
+}
+
 function renderPanel(){
   const d = addDays(weekMonday, selectedIdx);
   const k = currentDayKey();
   const day = state.weeks[k] || (state.weeks[k] = emptyDay());
   const host = document.getElementById('panelHost');
-  const people = day.people || 1;
 
   const mealsHtml = MEALS.map(m => {
     const items = day[m.key] || [];
-    const chips = items.map((item, idx) => `
+    const people = (day.peopleByMeal && day.peopleByMeal[m.key]) || 1;
+    const chips = items.map((item, idx) => {
+      const qtyText = fmtQty(item);
+      return `
       <span class="chip">
-        <span class="chip-food" data-meal="${m.key}" data-idx="${idx}">${escapeHtml(item.food)}${item.qty ? ` <span class="chip-qty">· ${escapeHtml(item.qty)}</span>` : ''}</span>
+        <span class="chip-food" data-meal="${m.key}" data-idx="${idx}">${escapeHtml(item.food)}${qtyText ? ` <span class="chip-qty">· ${escapeHtml(qtyText)}</span>` : ''}</span>
         <button data-meal="${m.key}" data-idx="${idx}" class="chip-remove" aria-label="Rimuovi">✕</button>
-      </span>
-    `).join('');
+      </span>`;
+    }).join('');
     return `
       <div class="meal">
-        <div class="meal-label"><span class="icon">${m.icon}</span>${m.label}</div>
+        <div class="meal-label-row">
+          <div class="meal-label"><span class="icon">${m.icon}</span>${m.label}</div>
+          <div class="people-stepper" data-meal="${m.key}">
+            <button class="pdec" aria-label="Diminuisci persone">−</button>
+            <span class="pcount">👤 ${people}</span>
+            <button class="pinc" aria-label="Aumenta persone">+</button>
+          </div>
+        </div>
         <div class="chips">${chips}<button class="chip-add" data-meal="${m.key}">＋ aggiungi</button></div>
       </div>
     `;
@@ -535,14 +594,6 @@ function renderPanel(){
   host.innerHTML = `
     <div class="day-panel">
       <div class="day-title">${DOW_FULL[selectedIdx]} <small>${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</small></div>
-      <div class="people-row">
-        <span class="people-label">Persone a tavola</span>
-        <div class="people-stepper">
-          <button id="peopleDec" aria-label="Diminuisci">−</button>
-          <span id="peopleCount">${people}</span>
-          <button id="peopleInc" aria-label="Aumenta">+</button>
-        </div>
-      </div>
       ${mealsHtml}
       <div class="actions">
         <button class="btn-copy" id="copyBtn">Copia il giorno</button>
@@ -567,17 +618,22 @@ function renderPanel(){
   host.querySelectorAll('.chip-add').forEach(btn=>{
     btn.addEventListener('click', ()=> openPicker(btn.dataset.meal));
   });
-  document.getElementById('peopleDec').addEventListener('click', ()=> changePeople(k, -1));
-  document.getElementById('peopleInc').addEventListener('click', ()=> changePeople(k, 1));
+  host.querySelectorAll('.people-stepper').forEach(stepper=>{
+    const mealKey = stepper.dataset.meal;
+    stepper.querySelector('.pdec').addEventListener('click', ()=> changePeople(k, mealKey, -1));
+    stepper.querySelector('.pinc').addEventListener('click', ()=> changePeople(k, mealKey, 1));
+  });
 
   document.getElementById('copyBtn').addEventListener('click', ()=> copyDay(d,k));
   document.getElementById('clearBtn').addEventListener('click', ()=> clearDay(k));
 }
 
-function changePeople(k, delta){
+function changePeople(k, mealKey, delta){
   const day = state.weeks[k];
-  const next = Math.max(1, Math.min(30, (day.people||1) + delta));
-  day.people = next;
+  const current = (day.peopleByMeal && day.peopleByMeal[mealKey]) || 1;
+  const next = Math.max(1, Math.min(30, current + delta));
+  if(!day.peopleByMeal) day.peopleByMeal = {};
+  day.peopleByMeal[mealKey] = next;
   renderPanel();
   scheduleSave();
 }
@@ -597,17 +653,18 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('resize', adjustModalViewport);
   window.visualViewport.addEventListener('scroll', adjustModalViewport);
 }
+let _scrollY = 0;
 function lockBodyScroll(lock){
   if(lock){
-    state._scrollY = window.scrollY;
+    _scrollY = window.scrollY;
     document.body.style.position = 'fixed';
-    document.body.style.top = (-state._scrollY) + 'px';
+    document.body.style.top = (-_scrollY) + 'px';
     document.body.style.width = '100%';
   } else {
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.width = '';
-    window.scrollTo(0, state._scrollY || 0);
+    window.scrollTo(0, _scrollY || 0);
   }
 }
 function showModal(id){
@@ -648,12 +705,22 @@ function renderFoodList(query){
   if(filtered.length === 0 && !q) html += `<div class="no-results">Inizia a scrivere per cercare…</div>`;
   html += filtered.map(f=>{
     const isSel = selected.includes(f);
-    return `<div class="food-item ${isSel?'selected':''}" data-food="${escapeHtml(f)}"><span>${escapeHtml(f)}</span><span class="check">✓</span></div>`;
+    const isCustom = state.customFoods.includes(f);
+    return `<div class="food-item ${isSel?'selected':''}" data-food="${escapeHtml(f)}">
+      <span class="food-item-text">${escapeHtml(f)}</span>
+      <span class="food-item-actions">
+        ${isCustom ? `<button class="ficon edit-food" data-food="${escapeHtml(f)}" aria-label="Rinomina">✏️</button>` : ''}
+        <button class="ficon del-food" data-food="${escapeHtml(f)}" aria-label="Rimuovi dall'elenco">🗑</button>
+        <span class="check">✓</span>
+      </span>
+    </div>`;
   }).join('');
   list.innerHTML = html;
 
   list.querySelectorAll('.food-item[data-food]').forEach(el=> el.addEventListener('click', ()=> toggleFood(el.dataset.food)));
   list.querySelectorAll('.food-item[data-custom]').forEach(el=> el.addEventListener('click', ()=> addCustomFood(el.dataset.custom)));
+  list.querySelectorAll('.edit-food').forEach(el=> el.addEventListener('click', (e)=>{ e.stopPropagation(); renameCatalogFood(el.dataset.food); }));
+  list.querySelectorAll('.del-food').forEach(el=> el.addEventListener('click', (e)=>{ e.stopPropagation(); removeFromCatalog(el.dataset.food); }));
 }
 
 function toggleFood(food){
@@ -661,7 +728,7 @@ function toggleFood(food){
   const arr = state.weeks[k][activeMealKey];
   const idx = arr.findIndex(it => it.food === food);
   if(idx >= 0) arr.splice(idx,1);
-  else arr.push({ food, qty: '' });
+  else arr.push({ food, qtyValue: '', qtyUnit: '' });
   renderFoodList(document.getElementById('searchInput').value);
   renderPanel();
   scheduleSave();
@@ -676,34 +743,58 @@ function addCustomFood(text){
   renderFoodList('');
 }
 
+function renameCatalogFood(oldName){
+  const next = window.prompt('Rinomina alimento', oldName);
+  if(next === null) return;
+  const trimmed = next.trim();
+  if(!trimmed || trimmed === oldName) return;
+  const idx = state.customFoods.indexOf(oldName);
+  if(idx >= 0) state.customFoods[idx] = trimmed;
+  scheduleSave();
+  renderFoodList(document.getElementById('searchInput').value);
+  showToast('Alimento rinominato nell\'elenco');
+}
+
+function removeFromCatalog(food){
+  const idx = state.customFoods.indexOf(food);
+  if(idx >= 0){
+    state.customFoods.splice(idx,1);
+  } else {
+    if(!state.removedDefaults.includes(food)) state.removedDefaults.push(food);
+  }
+  scheduleSave();
+  renderFoodList(document.getElementById('searchInput').value);
+  showToast('Rimosso dall\'elenco di ricerca');
+}
+
 document.getElementById('searchInput').addEventListener('input', (e)=> renderFoodList(e.target.value));
 document.getElementById('modalClose').addEventListener('click', closePicker);
 document.getElementById('modalDone').addEventListener('click', closePicker);
 document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id === 'modalBackdrop') closePicker(); });
 
-/* --- Quantity modal --- */
+/* --- Quantity / edit item modal --- */
 function openQtyEditor(mealKey, idx){
   const k = currentDayKey();
   const item = state.weeks[k][mealKey][idx];
   if(!item) return;
   qtyTarget = { mealKey, idx };
-  document.getElementById('qtyFoodLabel').textContent = item.food;
-  document.getElementById('qtyInput').value = item.qty || '';
+  document.getElementById('qtyFoodInput').value = item.food || '';
+  document.getElementById('qtyValueInput').value = item.qtyValue || '';
+  document.getElementById('qtyUnitSelect').value = item.qtyUnit || '';
   updateQtyHelper();
   showModal('qtyBackdrop');
-  setTimeout(()=> document.getElementById('qtyInput').focus(), 150);
 }
 function closeQty(){ hideModal('qtyBackdrop'); qtyTarget = null; }
 function updateQtyHelper(){
+  if(!qtyTarget) return;
   const k = currentDayKey();
   const day = state.weeks[k];
-  const people = (day && day.people) || 1;
-  const val = document.getElementById('qtyInput').value.trim();
+  const people = (day.peopleByMeal && day.peopleByMeal[qtyTarget.mealKey]) || 1;
+  const val = document.getElementById('qtyValueInput').value.trim().replace(',', '.');
+  const unit = document.getElementById('qtyUnitSelect').value;
   const helper = document.getElementById('qtyHelper');
-  const match = val.match(/^([\d]+(?:[.,]\d+)?)\s*(.*)$/);
-  if(match && people > 1){
-    const num = parseFloat(match[1].replace(',','.'));
-    const unit = match[2] || '';
+  const num = parseFloat(val);
+  if(!isNaN(num) && people > 1){
     const total = num * people;
     const totalStr = Number.isInteger(total) ? total : total.toFixed(1);
     helper.textContent = `≈ ${totalStr}${unit ? ' '+unit : ''} totali per ${people} persone`;
@@ -713,15 +804,20 @@ function updateQtyHelper(){
     helper.textContent = '';
   }
 }
-document.getElementById('qtyInput').addEventListener('input', updateQtyHelper);
+document.getElementById('qtyValueInput').addEventListener('input', updateQtyHelper);
+document.getElementById('qtyUnitSelect').addEventListener('change', updateQtyHelper);
 document.getElementById('qtyClose').addEventListener('click', closeQty);
 document.getElementById('qtyBackdrop').addEventListener('click', (e)=>{ if(e.target.id === 'qtyBackdrop') closeQty(); });
 document.getElementById('qtySave').addEventListener('click', ()=>{
   if(!qtyTarget) return;
   const k = currentDayKey();
-  const val = document.getElementById('qtyInput').value.trim();
   const item = state.weeks[k][qtyTarget.mealKey][qtyTarget.idx];
-  if(item) item.qty = val;
+  if(item){
+    const newFood = document.getElementById('qtyFoodInput').value.trim();
+    if(newFood) item.food = newFood;
+    item.qtyValue = document.getElementById('qtyValueInput').value.trim();
+    item.qtyUnit = document.getElementById('qtyUnitSelect').value;
+  }
   closeQty();
   renderPanel();
   scheduleSave();
@@ -730,11 +826,12 @@ document.getElementById('qtySave').addEventListener('click', ()=>{
 async function copyDay(d,k){
   const day = state.weeks[k] || emptyDay();
   const lines = [`${DOW_FULL[selectedIdx]} ${d.getDate()} ${MONTHS[d.getMonth()]}`];
-  if(day.people && day.people > 1) lines.push(`Persone: ${day.people}`);
   MEALS.forEach(m=>{
     const items = day[m.key] || [];
-    const text = items.length ? items.map(it => it.qty ? `${it.food} (${it.qty})` : it.food).join(', ') : '–';
-    lines.push(`${m.label}: ${text}`);
+    const people = (day.peopleByMeal && day.peopleByMeal[m.key]) || 1;
+    const text = items.length ? items.map(it => { const q = fmtQty(it); return q ? `${it.food} (${q})` : it.food; }).join(', ') : '–';
+    const peopleTxt = people > 1 ? ` (${people} persone)` : '';
+    lines.push(`${m.label}${peopleTxt}: ${text}`);
   });
   const text = lines.join('\n');
   try{ await navigator.clipboard.writeText(text); showToast('Copiato negli appunti'); }
@@ -800,6 +897,7 @@ document.getElementById('settingsSave').addEventListener('click', async ()=>{
     const record = await jsonbinGet();
     state.weeks = (record && record.weeks) ? record.weeks : {};
     state.customFoods = (record && record.customFoods) ? record.customFoods : [];
+    state.removedDefaults = (record && record.removedDefaults) ? record.removedDefaults : [];
     closeSettings();
     document.getElementById('welcomeWrap').style.display = 'none';
     document.getElementById('mainWrap').style.display = 'block';
