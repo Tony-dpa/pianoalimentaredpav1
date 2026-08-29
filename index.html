@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Piano Alimentare</title>
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Piano Alimentare">
+<meta name="theme-color" content="#3f6b4a">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
@@ -52,6 +59,7 @@ h1{
 .status-pill{
   font-family:'Space Mono', monospace; font-size: 10px; letter-spacing:0.04em;
   padding: 4px 9px; border-radius: 999px; display:flex; align-items:center; gap:5px; white-space:nowrap;
+  cursor:pointer; border:none;
 }
 .status-pill.ok{ background: rgba(63,107,74,0.12); color: var(--primary-dark); }
 .status-pill.err{ background: rgba(162,77,77,0.12); color: var(--berry); }
@@ -97,6 +105,13 @@ h1{
 .day-tab.is-selected .dots span{ background: rgba(255,255,255,0.35); }
 .day-tab.is-selected .dots span.filled{ background: var(--accent); }
 
+.shopping-btn{
+  width:100%; background: var(--card); border:1px solid var(--line); color:var(--primary-dark);
+  padding: 12px 14px; border-radius: 12px; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px;
+  cursor:pointer; margin: 2px 0 14px; box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.shopping-btn:active{ transform: scale(0.98); }
+
 .day-panel{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 16px 14px; margin-top: 4px; }
 .day-panel .day-title{ font-family:'Fraunces', serif; font-size: 22px; font-weight: 600; margin: 0 0 14px; display:flex; align-items:baseline; justify-content:space-between; gap: 8px; }
 .day-panel .day-title small{ font-family:'Space Mono', monospace; font-size: 12px; font-weight: 400; color: var(--ink-soft); }
@@ -139,6 +154,13 @@ h1{
 .actions button:active{ transform: scale(0.97); }
 .btn-copy{ background: var(--primary); color: #fff; }
 .btn-clear{ background: transparent; color: var(--berry); border: 1px solid rgba(162,77,77,0.35) !important; }
+
+.refresh-btn{
+  display:block; width:100%; margin-top: 16px; background: transparent; border: 1px dashed var(--line);
+  color: var(--ink-soft); padding: 11px; border-radius: 10px; font-family:'Work Sans',sans-serif; font-size:13px;
+  font-weight:600; cursor:pointer;
+}
+.refresh-btn:active{ transform: scale(0.98); }
 
 .toast{
   position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -207,6 +229,10 @@ h1{
 .setting-error.show{ display:block; }
 .qty-helper{ font-size: 12px; color: var(--ink-soft); margin: -8px 0 14px; font-family:'Space Mono',monospace; min-height:14px; flex:0 0 auto; }
 
+.shop-item{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px dashed var(--line); font-size:14.5px; }
+.shop-item:last-child{ border-bottom:none; }
+.shop-qty{ font-family:'Space Mono',monospace; color:var(--ink-soft); font-size:13px; white-space:nowrap; }
+
 .welcome-card{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 18px; text-align:center; margin-top: 20px; }
 .welcome-card .icon{ font-size: 34px; margin-bottom: 6px; }
 .welcome-card h2{ font-family:'Fraunces', serif; font-size: 21px; margin: 4px 0 8px; }
@@ -221,7 +247,7 @@ h1{
   <div>
     <div class="eyebrow">Fuori casa · questa settimana</div>
     <h1>Piano alimentare</h1>
-    <div class="header-actions"><span id="statusPill" class="status-pill err"><span class="dot"></span>non connesso</span></div>
+    <div class="header-actions"><button id="statusPill" class="status-pill err"><span class="dot"></span>non connesso</button></div>
   </div>
   <button class="gear-btn" id="gearBtn" aria-label="Impostazioni">⚙️</button>
 </header>
@@ -238,9 +264,12 @@ h1{
 
   <div class="day-tabs" id="dayTabs"></div>
 
+  <button class="shopping-btn" id="shoppingBtn">🛒 Lista della spesa (questa settimana)</button>
+
   <div id="panelHost"><div class="loading">caricamento…</div></div>
 
   <p class="tip">Aggiungi questa pagina alla schermata Home su iPhone (<b>Condividi → Aggiungi a Home</b>) per aprirla come un'app.</p>
+  <button class="refresh-btn" id="refreshBtn">🔄 Aggiorna dati dal cloud</button>
 </div>
 
 <div class="wrap" id="welcomeWrap" style="display:none;">
@@ -327,6 +356,17 @@ h1{
   </div>
 </div>
 
+<!-- Shopping list modal -->
+<div class="modal-backdrop" id="shoppingBackdrop">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><span>🛒 Lista della spesa</span><button class="close-x" id="shoppingClose">✕</button></div>
+    <p class="help-text" id="shoppingSubtitle">Settimana del …</p>
+    <div class="food-list" id="shoppingList"></div>
+    <button class="modal-done" id="shoppingCopy">Copia lista</button>
+  </div>
+</div>
+
 <script>
 const MEALS = [
   {key:'colazione', label:'Colazione', icon:'☀️'},
@@ -398,7 +438,6 @@ function migrateItems(arr){
       if('qtyValue' in it || 'qtyUnit' in it){
         return { food: it.food || '', qtyValue: it.qtyValue || '', qtyUnit: it.qtyUnit || '' };
       }
-      // legacy single "qty" text field: try to split into value + unit
       const legacy = (it.qty || '').trim();
       const m = legacy.match(/^([\d]+(?:[.,]\d+)?)\s*(.*)$/);
       if(m){ return { food: it.food || '', qtyValue: m[1].replace(',', '.'), qtyUnit: m[2] || '' }; }
@@ -413,7 +452,7 @@ function migrateDay(day){
   MEALS.forEach(m=>{
     let p;
     if(day && day.peopleByMeal && Number(day.peopleByMeal[m.key])) p = Number(day.peopleByMeal[m.key]);
-    else if(day && Number(day.people)) p = Number(day.people); // legacy single day-level count
+    else if(day && Number(day.people)) p = Number(day.people);
     o.peopleByMeal[m.key] = (p && p > 0) ? p : 1;
   });
   return o;
@@ -493,12 +532,36 @@ async function connectAndLoad(){
   }
 }
 
+async function refreshFromCloud(){
+  if(!config.binId || !config.apiKey) return;
+  setStatus(true, 'aggiornamento…');
+  try{
+    if(saveTimer){
+      clearTimeout(saveTimer);
+      saveTimer = null;
+      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods, removedDefaults: state.removedDefaults });
+    }
+    const record = await jsonbinGet();
+    state.weeks = (record && record.weeks) ? record.weeks : {};
+    state.customFoods = (record && record.customFoods) ? record.customFoods : [];
+    state.removedDefaults = (record && record.removedDefaults) ? record.removedDefaults : [];
+    ensureWeekLoaded();
+    render();
+    setStatus(true, 'sincronizzato');
+    showToast('Dati aggiornati');
+  }catch(e){
+    setStatus(false, 'errore aggiornamento');
+    showToast('Aggiornamento non riuscito');
+  }
+}
+
 function scheduleSave(){
   setStatus(true, 'salvataggio…');
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async ()=>{
     try{
       await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods, removedDefaults: state.removedDefaults });
+      saveTimer = null;
       setStatus(true, 'sincronizzato');
     }catch(e){
       setStatus(false, 'errore salvataggio');
@@ -639,7 +702,6 @@ function changePeople(k, mealKey, delta){
 }
 
 /* --- Modal viewport handling (keeps modals above the iOS keyboard) --- */
-let openModalId = null;
 function adjustModalViewport(){
   const vv = window.visualViewport;
   document.querySelectorAll('.modal-backdrop').forEach(bd=>{
@@ -668,14 +730,12 @@ function lockBodyScroll(lock){
   }
 }
 function showModal(id){
-  openModalId = id;
   adjustModalViewport();
   document.getElementById(id).classList.add('show');
   lockBodyScroll(true);
 }
 function hideModal(id){
   document.getElementById(id).classList.remove('show');
-  openModalId = null;
   lockBodyScroll(false);
 }
 
@@ -846,6 +906,70 @@ function clearDay(k){
   showToast('Giorno svuotato');
 }
 
+/* --- Shopping list (current week) --- */
+function buildShoppingMap(){
+  const map = {};
+  for(let i=0;i<7;i++){
+    const k = toKey(addDays(weekMonday,i));
+    const day = state.weeks[k];
+    if(!day) continue;
+    MEALS.forEach(m=>{
+      const items = day[m.key] || [];
+      const people = (day.peopleByMeal && day.peopleByMeal[m.key]) || 1;
+      items.forEach(it=>{
+        if(!it.food) return;
+        if(!map[it.food]) map[it.food] = { qtyTotals: {}, plainCount: 0 };
+        const num = parseFloat((it.qtyValue||'').replace(',','.'));
+        if(!isNaN(num)){
+          const unit = it.qtyUnit || '';
+          map[it.food].qtyTotals[unit] = (map[it.food].qtyTotals[unit]||0) + num*people;
+        } else {
+          map[it.food].plainCount += 1;
+        }
+      });
+    });
+  }
+  return map;
+}
+function shoppingLinePartsFor(entry){
+  const parts = [];
+  Object.keys(entry.qtyTotals).forEach(unit=>{
+    const total = entry.qtyTotals[unit];
+    const totalStr = Number.isInteger(total) ? total : total.toFixed(1);
+    parts.push(`${totalStr}${unit ? ' '+unit : ''}`);
+  });
+  if(entry.plainCount > 0) parts.push(entry.plainCount > 1 ? `×${entry.plainCount}` : '');
+  return parts.filter(Boolean);
+}
+function renderShoppingList(){
+  document.getElementById('shoppingSubtitle').textContent = 'Settimana del ' + fmtRange(weekMonday);
+  const map = buildShoppingMap();
+  const foods = Object.keys(map).sort((a,b)=>a.localeCompare(b,'it'));
+  const list = document.getElementById('shoppingList');
+  if(foods.length === 0){
+    list.innerHTML = '<div class="no-results">Nessun alimento pianificato questa settimana.</div>';
+    return;
+  }
+  list.innerHTML = foods.map(food=>{
+    const parts = shoppingLinePartsFor(map[food]);
+    return `<div class="shop-item"><span>${escapeHtml(food)}</span><span class="shop-qty">${escapeHtml(parts.join(' + '))}</span></div>`;
+  }).join('');
+}
+document.getElementById('shoppingBtn').addEventListener('click', ()=>{ renderShoppingList(); showModal('shoppingBackdrop'); });
+document.getElementById('shoppingClose').addEventListener('click', ()=> hideModal('shoppingBackdrop'));
+document.getElementById('shoppingBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='shoppingBackdrop') hideModal('shoppingBackdrop'); });
+document.getElementById('shoppingCopy').addEventListener('click', async ()=>{
+  const map = buildShoppingMap();
+  const foods = Object.keys(map).sort((a,b)=>a.localeCompare(b,'it'));
+  const lines = [`Lista della spesa — settimana del ${fmtRange(weekMonday)}`];
+  foods.forEach(food=>{
+    const parts = shoppingLinePartsFor(map[food]);
+    lines.push(`- ${food}${parts.length ? ' — ' + parts.join(' + ') : ''}`);
+  });
+  try{ await navigator.clipboard.writeText(lines.join('\n')); showToast('Lista copiata negli appunti'); }
+  catch(e){ showToast('Copia non riuscita'); }
+});
+
 let toastTimer = null;
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -863,6 +987,8 @@ document.getElementById('todayBtn').addEventListener('click', ()=>{
   selectedIdx = t===0?6:t-1;
   render();
 });
+document.getElementById('refreshBtn').addEventListener('click', refreshFromCloud);
+document.getElementById('statusPill').addEventListener('click', refreshFromCloud);
 
 /* --- Settings modal --- */
 function openSettings(){
