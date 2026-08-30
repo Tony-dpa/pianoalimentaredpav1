@@ -229,9 +229,21 @@ h1{
 .setting-error.show{ display:block; }
 .qty-helper{ font-size: 12px; color: var(--ink-soft); margin: -8px 0 14px; font-family:'Space Mono',monospace; min-height:14px; flex:0 0 auto; }
 
-.shop-item{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px dashed var(--line); font-size:14.5px; }
+.shop-item{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 4px; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer; }
 .shop-item:last-child{ border-bottom:none; }
-.shop-qty{ font-family:'Space Mono',monospace; color:var(--ink-soft); font-size:13px; white-space:nowrap; }
+.shop-item:active{ background:#f2f0e4; }
+.shop-row-main{ display:flex; align-items:center; gap:11px; flex:1; min-width:0; }
+.shop-check{
+  width:21px; height:21px; border-radius:7px; border:1.6px solid var(--line); background:var(--card);
+  display:flex; align-items:center; justify-content:center; flex:0 0 auto; font-size:13px; color:#fff;
+}
+.shop-item.checked .shop-check{ background: var(--primary); border-color: var(--primary-dark); }
+.shop-food-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.shop-item.checked .shop-food-name{ text-decoration: line-through; color: var(--ink-soft); }
+.shop-qty{ font-family:'Space Mono',monospace; color:var(--ink-soft); font-size:13px; white-space:nowrap; flex:0 0 auto; }
+.shop-item.checked .shop-qty{ opacity:0.6; }
+.shopping-subtitle-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex:0 0 auto; }
+.link-btn{ background:none; border:none; color:var(--primary-dark); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; font-family:'Work Sans',sans-serif; padding:0; white-space:nowrap; }
 
 .welcome-card{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 18px; text-align:center; margin-top: 20px; }
 .welcome-card .icon{ font-size: 34px; margin-bottom: 6px; }
@@ -361,7 +373,10 @@ h1{
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title"><span>🛒 Lista della spesa</span><button class="close-x" id="shoppingClose">✕</button></div>
-    <p class="help-text" id="shoppingSubtitle">Settimana del …</p>
+    <div class="shopping-subtitle-row">
+      <span class="help-text" id="shoppingSubtitle" style="margin:0;">Settimana del …</span>
+      <button class="link-btn" id="shoppingResetBtn">Deseleziona tutto</button>
+    </div>
     <div class="food-list" id="shoppingList"></div>
     <button class="modal-done" id="shoppingCopy">Copia lista</button>
   </div>
@@ -417,7 +432,7 @@ function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 
 let weekMonday = getMonday(new Date());
 let selectedIdx = (function(){ const t = new Date().getDay(); return t===0?6:t-1; })();
-let state = { weeks: {}, customFoods: [], removedDefaults: [] };
+let state = { weeks: {}, customFoods: [], removedDefaults: [], shoppingChecked: {} };
 let activeMealKey = null;
 let qtyTarget = null;
 let saveTimer = null;
@@ -523,6 +538,7 @@ async function connectAndLoad(){
     state.weeks = (record && record.weeks) ? record.weeks : {};
     state.customFoods = (record && record.customFoods) ? record.customFoods : [];
     state.removedDefaults = (record && record.removedDefaults) ? record.removedDefaults : [];
+    state.shoppingChecked = (record && record.shoppingChecked) ? record.shoppingChecked : {};
     setStatus(true, 'sincronizzato');
     ensureWeekLoaded();
     render();
@@ -539,12 +555,13 @@ async function refreshFromCloud(){
     if(saveTimer){
       clearTimeout(saveTimer);
       saveTimer = null;
-      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods, removedDefaults: state.removedDefaults });
+      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods, removedDefaults: state.removedDefaults, shoppingChecked: state.shoppingChecked });
     }
     const record = await jsonbinGet();
     state.weeks = (record && record.weeks) ? record.weeks : {};
     state.customFoods = (record && record.customFoods) ? record.customFoods : [];
     state.removedDefaults = (record && record.removedDefaults) ? record.removedDefaults : [];
+    state.shoppingChecked = (record && record.shoppingChecked) ? record.shoppingChecked : {};
     ensureWeekLoaded();
     render();
     setStatus(true, 'sincronizzato');
@@ -560,7 +577,7 @@ function scheduleSave(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async ()=>{
     try{
-      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods, removedDefaults: state.removedDefaults });
+      await jsonbinPut({ weeks: state.weeks, customFoods: state.customFoods, removedDefaults: state.removedDefaults, shoppingChecked: state.shoppingChecked });
       saveTimer = null;
       setStatus(true, 'sincronizzato');
     }catch(e){
@@ -941,10 +958,16 @@ function shoppingLinePartsFor(entry){
   if(entry.plainCount > 0) parts.push(entry.plainCount > 1 ? `×${entry.plainCount}` : '');
   return parts.filter(Boolean);
 }
+function currentShoppingChecks(){
+  const wk = toKey(weekMonday);
+  if(!state.shoppingChecked[wk]) state.shoppingChecked[wk] = {};
+  return state.shoppingChecked[wk];
+}
 function renderShoppingList(){
   document.getElementById('shoppingSubtitle').textContent = 'Settimana del ' + fmtRange(weekMonday);
   const map = buildShoppingMap();
   const foods = Object.keys(map).sort((a,b)=>a.localeCompare(b,'it'));
+  const checks = currentShoppingChecks();
   const list = document.getElementById('shoppingList');
   if(foods.length === 0){
     list.innerHTML = '<div class="no-results">Nessun alimento pianificato questa settimana.</div>';
@@ -952,19 +975,44 @@ function renderShoppingList(){
   }
   list.innerHTML = foods.map(food=>{
     const parts = shoppingLinePartsFor(map[food]);
-    return `<div class="shop-item"><span>${escapeHtml(food)}</span><span class="shop-qty">${escapeHtml(parts.join(' + '))}</span></div>`;
+    const checked = !!checks[food];
+    return `<div class="shop-item ${checked?'checked':''}" data-food="${escapeHtml(food)}">
+      <div class="shop-row-main">
+        <span class="shop-check">${checked ? '✓' : ''}</span>
+        <span class="shop-food-name">${escapeHtml(food)}</span>
+      </div>
+      <span class="shop-qty">${escapeHtml(parts.join(' + '))}</span>
+    </div>`;
   }).join('');
+  list.querySelectorAll('.shop-item').forEach(el=>{
+    el.addEventListener('click', ()=> toggleShoppingCheck(el.dataset.food));
+  });
+}
+function toggleShoppingCheck(food){
+  const checks = currentShoppingChecks();
+  checks[food] = !checks[food];
+  renderShoppingList();
+  scheduleSave();
 }
 document.getElementById('shoppingBtn').addEventListener('click', ()=>{ renderShoppingList(); showModal('shoppingBackdrop'); });
 document.getElementById('shoppingClose').addEventListener('click', ()=> hideModal('shoppingBackdrop'));
 document.getElementById('shoppingBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='shoppingBackdrop') hideModal('shoppingBackdrop'); });
+document.getElementById('shoppingResetBtn').addEventListener('click', ()=>{
+  const wk = toKey(weekMonday);
+  state.shoppingChecked[wk] = {};
+  renderShoppingList();
+  scheduleSave();
+  showToast('Spunte azzerate');
+});
 document.getElementById('shoppingCopy').addEventListener('click', async ()=>{
   const map = buildShoppingMap();
   const foods = Object.keys(map).sort((a,b)=>a.localeCompare(b,'it'));
+  const checks = currentShoppingChecks();
   const lines = [`Lista della spesa — settimana del ${fmtRange(weekMonday)}`];
   foods.forEach(food=>{
     const parts = shoppingLinePartsFor(map[food]);
-    lines.push(`- ${food}${parts.length ? ' — ' + parts.join(' + ') : ''}`);
+    const mark = checks[food] ? '[x]' : '[ ]';
+    lines.push(`- ${mark} ${food}${parts.length ? ' — ' + parts.join(' + ') : ''}`);
   });
   try{ await navigator.clipboard.writeText(lines.join('\n')); showToast('Lista copiata negli appunti'); }
   catch(e){ showToast('Copia non riuscita'); }
@@ -1024,6 +1072,7 @@ document.getElementById('settingsSave').addEventListener('click', async ()=>{
     state.weeks = (record && record.weeks) ? record.weeks : {};
     state.customFoods = (record && record.customFoods) ? record.customFoods : [];
     state.removedDefaults = (record && record.removedDefaults) ? record.removedDefaults : [];
+    state.shoppingChecked = (record && record.shoppingChecked) ? record.shoppingChecked : {};
     closeSettings();
     document.getElementById('welcomeWrap').style.display = 'none';
     document.getElementById('mainWrap').style.display = 'block';
