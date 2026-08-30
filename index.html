@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Meal Plan</title>
+<title>Piano Alimentare</title>
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Meal Plan">
+<meta name="apple-mobile-web-app-title" content="Piano Alimentare">
 <meta name="theme-color" content="#3f6b4a">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root{
-  --bg: #f4fae6;
+  --bg: #eef1e6;
   --ink: #262421;
   --ink-soft: #6f6a5c;
   --primary: #3f6b4a;
@@ -116,6 +116,13 @@ h1{
 .day-panel .day-title{ font-family:'Fraunces', serif; font-size: 22px; font-weight: 600; margin: 0 0 14px; display:flex; align-items:baseline; justify-content:space-between; gap: 8px; }
 .day-panel .day-title small{ font-family:'Space Mono', monospace; font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 
+.paste-banner{ display:flex; align-items:center; justify-content:space-between; gap:10px; background: rgba(217,164,65,0.15); border:1px solid rgba(217,164,65,0.4); border-radius:10px; padding:10px 12px; margin-bottom:14px; font-size:13px; }
+.paste-banner b{ color:var(--primary-dark); }
+.paste-banner-actions{ display:flex; align-items:center; gap:8px; flex:0 0 auto; }
+.paste-banner-actions button{ border:none; border-radius:8px; padding:6px 10px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:'Work Sans',sans-serif; }
+#pasteHereBtn{ background:var(--primary); color:#fff; }
+#cancelClipboardBtn{ background:transparent; color:var(--ink-soft); padding:6px; font-size:14px; }
+
 .meal{ border-top: 1px dashed var(--line); padding: 13px 0; }
 .meal:first-of-type{ border-top: none; padding-top: 0; }
 .meal-label-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 9px; }
@@ -147,12 +154,13 @@ h1{
 
 .actions{ display:flex; gap:10px; margin-top: 16px; }
 .actions button{
-  flex:1; border: none; padding: 12px 14px; border-radius: 10px; font-family:'Work Sans', sans-serif;
-  font-weight: 600; font-size: 14px; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+  flex:1; border: none; padding: 12px 8px; border-radius: 10px; font-family:'Work Sans', sans-serif;
+  font-weight: 600; font-size: 13px; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:5px;
   transition: transform .15s ease, opacity .15s ease;
 }
 .actions button:active{ transform: scale(0.97); }
 .btn-copy{ background: var(--primary); color: #fff; }
+.btn-duplicate{ background: transparent; color: var(--primary-dark); border: 1px solid var(--line) !important; }
 .btn-clear{ background: transparent; color: var(--berry); border: 1px solid rgba(162,77,77,0.35) !important; }
 
 .refresh-btn{
@@ -436,6 +444,7 @@ let state = { weeks: {}, customFoods: [], removedDefaults: [], shoppingChecked: 
 let activeMealKey = null;
 let qtyTarget = null;
 let saveTimer = null;
+let dayClipboard = null;
 let config = { binId: null, apiKey: null };
 
 function emptyDay(){
@@ -674,9 +683,18 @@ function renderPanel(){
   host.innerHTML = `
     <div class="day-panel">
       <div class="day-title">${DOW_FULL[selectedIdx]} <small>${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</small></div>
+      ${dayClipboard ? `
+      <div class="paste-banner">
+        <span>📋 Hai copiato <b>${escapeHtml(dayClipboard.label)}</b></span>
+        <div class="paste-banner-actions">
+          <button id="pasteHereBtn">Incolla qui</button>
+          <button id="cancelClipboardBtn" aria-label="Annulla">✕</button>
+        </div>
+      </div>` : ''}
       ${mealsHtml}
       <div class="actions">
-        <button class="btn-copy" id="copyBtn">Copia il giorno</button>
+        <button class="btn-copy" id="copyBtn">Copia testo</button>
+        <button class="btn-duplicate" id="duplicateBtn">📋 Duplica</button>
         <button class="btn-clear" id="clearBtn">Svuota</button>
       </div>
     </div>
@@ -705,7 +723,34 @@ function renderPanel(){
   });
 
   document.getElementById('copyBtn').addEventListener('click', ()=> copyDay(d,k));
+  document.getElementById('duplicateBtn').addEventListener('click', ()=> duplicateDay(k, `${DOW_FULL[selectedIdx]} ${d.getDate()} ${MONTHS[d.getMonth()]}`));
   document.getElementById('clearBtn').addEventListener('click', ()=> clearDay(k));
+  const pasteBtn = document.getElementById('pasteHereBtn');
+  if(pasteBtn) pasteBtn.addEventListener('click', ()=> pasteDay(k));
+  const cancelBtn = document.getElementById('cancelClipboardBtn');
+  if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ dayClipboard = null; renderPanel(); });
+}
+
+function dayHasContent(day){
+  return MEALS.some(m => (day[m.key]||[]).length > 0);
+}
+function duplicateDay(k, label){
+  dayClipboard = { label, data: JSON.parse(JSON.stringify(state.weeks[k])) };
+  renderPanel();
+  showToast('Giorno copiato: vai su un altro giorno e tocca "Incolla qui"');
+}
+function pasteDay(k){
+  if(!dayClipboard) return;
+  const day = state.weeks[k];
+  if(dayHasContent(day)){
+    const ok = window.confirm('Questo giorno contiene già alimenti: sovrascrivere con il giorno copiato?');
+    if(!ok) return;
+  }
+  state.weeks[k] = JSON.parse(JSON.stringify(dayClipboard.data));
+  renderPanel();
+  renderDots();
+  scheduleSave();
+  showToast('Giorno incollato');
 }
 
 function changePeople(k, mealKey, delta){
